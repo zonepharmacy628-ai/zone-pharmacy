@@ -1,6 +1,8 @@
 "use client";
 
-import { Ban, Check, X } from "lucide-react";
+import { Ban, Check, Eye, Truck, X } from "lucide-react";
+import Link from "next/link";
+import { useState } from "react";
 import { setPaymentStatusAction, setPrescriptionStatusAction, updateOrderStatusAction } from "@/actions/admin/orders";
 import { ActionButton } from "@/components/ui/form";
 import { ORDER_STATUSES, ORDER_STATUS_LABELS, type OrderStatus } from "@/lib/constants";
@@ -84,6 +86,86 @@ export function PrescriptionControls({ orderId, current }: { orderId: number; cu
       >
         <X className="size-4" /> Reject
       </ActionButton>
+    </div>
+  );
+}
+
+/**
+ * Actions panel shown beside every order on the Orders list: open the order, dispatch it,
+ * or set any status. Permissions are enforced again on the server by updateOrderStatusAction.
+ */
+export function OrderRowActions({
+  orderId,
+  orderNumber,
+  status,
+  canManage,
+}: {
+  orderId: number;
+  orderNumber: string;
+  status: OrderStatus;
+  canManage: boolean;
+}) {
+  const [selected, setSelected] = useState<OrderStatus>(status);
+  // Keep the dropdown in step with the order after the list refreshes.
+  const [lastStatus, setLastStatus] = useState(status);
+  if (lastStatus !== status) {
+    setLastStatus(status);
+    setSelected(status);
+  }
+  const closed = status === "cancelled" || status === "delivered";
+  const canDispatch = status === "pending" || status === "confirmed" || status === "processing";
+
+  return (
+    <div className="flex flex-col gap-2">
+      <Link href={`/admin/orders/${orderId}`} className="btn btn-outline w-full">
+        <Eye className="size-4" /> View Order
+      </Link>
+
+      {!canManage ? (
+        <p className="text-xs text-navy-500">You can view orders but not change them.</p>
+      ) : closed ? (
+        <p className="text-xs text-navy-500">This order is {ORDER_STATUS_LABELS[status].toLowerCase()} and can no longer be changed.</p>
+      ) : (
+        <>
+          {canDispatch && (
+            <ActionButton action={() => updateOrderStatusAction(orderId, "shipped")} className="btn btn-primary w-full">
+              <Truck className="size-4" /> Dispatch (Mark Shipped)
+            </ActionButton>
+          )}
+          {status === "shipped" && (
+            <ActionButton action={() => updateOrderStatusAction(orderId, "delivered")} className="btn btn-primary w-full">
+              <Check className="size-4" /> Mark Delivered
+            </ActionButton>
+          )}
+          <div>
+            <label htmlFor={`order-status-${orderId}`} className="mb-1 block text-xs font-semibold text-navy-700">
+              Change status
+            </label>
+            <div className="flex gap-2">
+              <select
+                id={`order-status-${orderId}`}
+                value={selected}
+                onChange={(e) => setSelected(e.target.value as OrderStatus)}
+                className="input min-w-0 flex-1 py-2"
+              >
+                {ORDER_STATUSES.map((s) => (
+                  <option key={s} value={s}>
+                    {ORDER_STATUS_LABELS[s]}
+                  </option>
+                ))}
+              </select>
+              <ActionButton
+                action={() => updateOrderStatusAction(orderId, selected)}
+                disabled={selected === status}
+                confirm={selected === "cancelled" ? `Cancel order #${orderNumber}? The items will be returned to stock. This cannot be undone.` : undefined}
+                className="btn btn-outline shrink-0 px-3"
+              >
+                Update
+              </ActionButton>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }

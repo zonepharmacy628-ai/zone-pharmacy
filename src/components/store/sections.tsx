@@ -10,13 +10,14 @@ const TRUST = [
 
 export function TrustBar() {
   return (
-    <ul className="grid grid-cols-2 gap-4 rounded-2xl border border-line bg-brand-50 p-4 sm:p-6 lg:grid-cols-4">
+    // Compact single card on phones and tablets; the lg classes keep the original desktop layout.
+    <ul className="grid grid-cols-2 gap-x-3 gap-y-2.5 rounded-2xl border border-line bg-brand-50 p-3 shadow-card sm:gap-4 sm:p-4 lg:grid-cols-4 lg:p-6 lg:shadow-none">
       {TRUST.map((t) => (
-        <li key={t.title} className="flex items-center gap-3">
-          <t.icon className="size-8 shrink-0 text-brand-600" strokeWidth={1.6} />
+        <li key={t.title} className="flex items-center gap-2 sm:gap-3">
+          <t.icon className="size-6 shrink-0 text-brand-600 sm:size-7 lg:size-8" strokeWidth={1.6} />
           <div className="min-w-0">
-            <p className="text-sm font-semibold text-navy-900">{t.title}</p>
-            <p className="text-xs text-navy-500">{t.text}</p>
+            <p className="text-[13px]/[1.2] font-semibold text-navy-900 sm:text-sm">{t.title}</p>
+            <p className="text-[11px]/[1.25] text-navy-500 sm:text-xs">{t.text}</p>
           </div>
         </li>
       ))}

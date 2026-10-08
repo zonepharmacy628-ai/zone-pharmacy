@@ -1,7 +1,7 @@
 import { ArrowRight, ClipboardPlus, ShieldCheck, Truck } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { CategoryIcon } from "@/components/brand";
+import { CategorySlider } from "@/components/store/category-slider";
 import { ProductSlider } from "@/components/store/product-card";
 import { HeroArt, TrustBar } from "@/components/store/sections";
 import { getActiveCategories, productSection } from "@/lib/catalog";
@@ -17,7 +17,7 @@ export default async function HomePage() {
     productSection("new"),
   ]);
   const chosen = categories.filter((c) => settings.popularCategoryIds.includes(c.id));
-  const popularCategories = (chosen.length ? chosen : categories).slice(0, 8);
+  const popularCategories = chosen.length ? chosen : categories;
   const heroImage = fileUrl(settings.heroImageFileId);
 
   return (
@@ -63,31 +63,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section aria-labelledby="shop-by-category" className="card p-4 sm:p-6">
-        <div className="mb-4 flex items-center justify-between">
-          <h2 id="shop-by-category" className="h-section">
-            Shop by Category
-          </h2>
-          <Link href="/products" className="text-sm font-semibold text-brand-600 hover:text-brand-700">
-            View All →
-          </Link>
-        </div>
-        <ul className="grid grid-cols-2 gap-2.5 sm:grid-cols-4 sm:gap-3 lg:grid-cols-8">
-          {popularCategories.map((c) => (
-            <li key={c.id}>
-              <Link
-                href={`/category/${c.slug}`}
-                className="flex h-full items-center gap-2.5 rounded-2xl border border-line p-2.5 transition hover:border-brand-300 hover:bg-brand-50 sm:flex-col sm:gap-3 sm:p-4 sm:text-center"
-              >
-                <span className="grid size-10 shrink-0 place-items-center rounded-full bg-brand-100 text-brand-600 sm:size-14">
-                  <CategoryIcon name={c.icon} className="size-5 sm:size-6" />
-                </span>
-                <span className="min-w-0 text-xs leading-tight font-semibold text-navy-900 sm:text-sm">{c.name}</span>
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </section>
+      <CategorySlider categories={popularCategories.map(({ id, name, slug, icon }) => ({ id, name, slug, icon }))} />
 
       <TrustBar />
 

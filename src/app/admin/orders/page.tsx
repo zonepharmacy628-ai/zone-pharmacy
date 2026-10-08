@@ -1,19 +1,31 @@
 import { and, desc, eq, ilike, or, sql, type SQL } from "drizzle-orm";
 import { ClipboardList, Search } from "lucide-react";
 import Link from "next/link";
+import { OrderRowActions } from "@/components/admin/order-controls";
 import { EmptyState, OrderStatusBadge, PageHeader, Pagination, PaymentStatusBadge } from "@/components/ui/misc";
 import { requireStaffPage } from "@/lib/auth";
 import { ORDER_STATUSES, ORDER_STATUS_LABELS, PAYMENT_METHOD_LABELS, type OrderStatus, type PaymentMethod } from "@/lib/constants";
 import { getDb } from "@/lib/db";
 import { orders } from "@/lib/db/schema";
+import { can } from "@/lib/permissions";
 import { getSettings } from "@/lib/settings";
 import { cn, escapeLike, formatDateTime, formatMoney } from "@/lib/utils";
 
 export const metadata = { title: "Orders" };
 const PER_PAGE = 25;
 
+function Info({ label, className, children }: { label: string; className?: string; children: React.ReactNode }) {
+  return (
+    <div className={cn("min-w-0", className)}>
+      <dt className="text-[11px] font-semibold tracking-wide text-navy-500 uppercase">{label}</dt>
+      <dd className="mt-0.5 text-sm break-words text-navy-900">{children}</dd>
+    </div>
+  );
+}
+
 export default async function AdminOrdersPage({ searchParams }: { searchParams: Promise<{ status?: string; q?: string; page?: string }> }) {
-  await requireStaffPage("view_orders", "manage_orders");
+  const user = await requireStaffPage("view_orders", "manage_orders");
+  const canManage = can(user, "manage_orders");
   const sp = await searchParams;
   const status = ORDER_STATUSES.includes(sp.status as OrderStatus) ? (sp.status as OrderStatus) : undefined;
   const q = sp.q?.trim().slice(0, 80) || undefined;
@@ -57,10 +69,10 @@ export default async function AdminOrdersPage({ searchParams }: { searchParams: 
     <>
       <PageHeader title="Orders" subtitle={`${total} order${total === 1 ? "" : "s"}`} />
       <div className="card">
-        <div className="flex flex-col gap-3 border-b border-line p-4 lg:flex-row lg:items-center lg:justify-between">
-          <ul className="no-scrollbar flex gap-2 overflow-x-auto">
+        <div className="flex flex-col gap-3 p-4 xl:flex-row xl:items-center xl:justify-between">
+          <ul className="flex flex-wrap gap-2">
             {[undefined, ...ORDER_STATUSES].map((s) => (
-              <li key={s ?? "all"} className="shrink-0">
+              <li key={s ?? "all"}>
                 <Link href={href({ status: s })} className={cn("btn btn-sm", status === s ? "btn-primary" : "btn-outline")}>
                   {s ? ORDER_STATUS_LABELS[s] : "All"}
                 </Link>
@@ -72,70 +84,65 @@ export default async function AdminOrdersPage({ searchParams }: { searchParams: 
             <label htmlFor="order-q" className="sr-only">
               Search orders
             </label>
-            <input id="order-q" name="q" defaultValue={q ?? ""} placeholder="Order no., name, phone, email" className="input min-w-0 py-2 lg:w-72" />
+            <input id="order-q" name="q" defaultValue={q ?? ""} placeholder="Order no., name, phone, email" className="input min-w-0 flex-1 py-2 xl:w-72 xl:flex-none" />
             <button type="submit" className="btn btn-primary btn-sm" aria-label="Search">
               <Search className="size-4" />
             </button>
           </form>
         </div>
-        {rows.length === 0 ? (
-          <EmptyState icon={<ClipboardList />} title="No orders found" text={q || status ? "Try a different search or status filter." : "Orders will appear here once customers start ordering."} />
-        ) : (
-          <div className="table-wrap">
-            <table className="table-base min-w-[1100px]">
-              <thead>
-                <tr>
-                  <th>Order No.</th>
-                  <th>Customer</th>
-                  <th>Contact</th>
-                  <th>Address</th>
-                  <th>Products</th>
-                  <th>Qty</th>
-                  <th>Total</th>
-                  <th>Payment</th>
-                  <th>Date</th>
-                  <th>Status</th>
-                  <th />
-                </tr>
-              </thead>
-              <tbody>
-                {rows.map(({ order: o, items, summary }) => (
-                  <tr key={o.id}>
-                    <td className="font-bold whitespace-nowrap">#{o.orderNumber}</td>
-                    <td className="font-medium">{o.customerName}</td>
-                    <td className="text-xs text-navy-700">
-                      {o.phone}
-                      <br />
-                      {o.email}
-                    </td>
-                    <td className="max-w-48 text-xs text-navy-700">
-                      {o.address}, {o.city}
-                    </td>
-                    <td className="max-w-56 text-xs text-navy-700">
-                      <span className="line-clamp-2">{summary}</span>
-                    </td>
-                    <td>{items}</td>
-                    <td className="font-semibold whitespace-nowrap">{formatMoney(o.total, settings.currency)}</td>
-                    <td className="text-xs">
-                      <span className="mb-1 block font-medium whitespace-nowrap">{PAYMENT_METHOD_LABELS[o.paymentMethod as PaymentMethod] ?? o.paymentMethod}</span>
-                      <PaymentStatusBadge status={o.paymentStatus} />
-                    </td>
-                    <td className="text-xs whitespace-nowrap text-navy-700">{formatDateTime(o.createdAt)}</td>
-                    <td>
-                      <OrderStatusBadge status={o.status} />
-                    </td>
-                    <td>
-                      <Link href={`/admin/orders/${o.id}`} className="btn btn-outline btn-sm">
-                        View
-                      </Link>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
       </div>
+
+      {rows.length === 0 ? (
+        <div className="card mt-4">
+          <EmptyState icon={<ClipboardList />} title="No orders found" text={q || status ? "Try a different search or status filter." : "Orders will appear here once customers start ordering."} />
+        </div>
+      ) : (
+        // One card per order: details on the left, the Actions panel always on the right (below on phones).
+        // Nothing here scrolls sideways at any screen width.
+        <ul className="mt-4 space-y-4">
+          {rows.map(({ order: o, items, summary }) => (
+            <li key={o.id} className="card grid overflow-hidden md:grid-cols-[minmax(0,1fr)_15rem]">
+              <dl className="grid grid-cols-2 gap-x-5 gap-y-4 p-4 sm:grid-cols-3 sm:p-5 xl:grid-cols-4">
+                <Info label="Order No.">
+                  <Link href={`/admin/orders/${o.id}`} className="font-bold hover:text-brand-600">
+                    #{o.orderNumber}
+                  </Link>
+                </Info>
+                <Info label="Status">
+                  <OrderStatusBadge status={o.status} />
+                </Info>
+                <Info label="Customer">
+                  <span className="font-medium">{o.customerName}</span>
+                </Info>
+                <Info label="Contact">
+                  {o.phone}
+                  <br />
+                  <span className="text-navy-700">{o.email}</span>
+                </Info>
+                <Info label="Address" className="col-span-2 sm:col-span-1 xl:col-span-2">
+                  {o.address}, {o.city}
+                </Info>
+                <Info label="Products" className="col-span-2">
+                  {summary}
+                </Info>
+                <Info label="Qty">{items}</Info>
+                <Info label="Total">
+                  <span className="font-bold">{formatMoney(o.total, settings.currency)}</span>
+                </Info>
+                <Info label="Payment">
+                  <span className="mb-1 block font-medium">{PAYMENT_METHOD_LABELS[o.paymentMethod as PaymentMethod] ?? o.paymentMethod}</span>
+                  <PaymentStatusBadge status={o.paymentStatus} />
+                </Info>
+                <Info label="Date">{formatDateTime(o.createdAt)}</Info>
+              </dl>
+              <div className="border-t border-line bg-surface p-4 md:border-t-0 md:border-l">
+                <p className="mb-3 text-[11px] font-semibold tracking-wide text-navy-500 uppercase">Actions</p>
+                <OrderRowActions orderId={o.id} orderNumber={o.orderNumber} status={o.status as OrderStatus} canManage={canManage} />
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
       <Pagination page={page} pages={Math.ceil(total / PER_PAGE)} hrefFor={(p) => href({ page: p })} />
     </>
   );
