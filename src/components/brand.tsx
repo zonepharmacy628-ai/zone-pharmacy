@@ -77,10 +77,11 @@ export function Logo({
     return <Image src={src} alt={name} width={180} height={48} unoptimized priority className={cn("h-10 w-auto object-contain sm:h-12", className)} />;
   }
   const words = name.trim().split(/\s+/);
-  const first = words[0] ?? "MediZone";
+  const first = words[0] ?? "24Zone";
   const rest = words.slice(1).join(" ");
-  // "MediZone" renders two-tone like the approved logo; any other name stays one colour.
-  const split = first === "MediZone" ? ["Medi", "Zone"] : [first, ""];
+  // A name ending in "Zone" (24Zone) renders two-tone like the approved logo; any other name stays one colour.
+  const zone = /^(.+)(Zone)$/.exec(first);
+  const split = zone ? [zone[1], zone[2]] : [first, ""];
   return (
     <span className={cn("flex items-center gap-2.5", className)}>
       <LogoMark className="size-10 shrink-0 sm:size-11" />

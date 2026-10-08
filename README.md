@@ -1,4 +1,4 @@
-# MediZone Pharmacy
+# 24Zone Pharmacy
 
 Online pharmacy storefront and admin panel.
 

@@ -10,13 +10,13 @@ import { formatDate } from "@/lib/utils";
 
 export const metadata: Metadata = {
   title: "Track Your Order",
-  description: "Enter your order number to see the latest status of your MediZone Pharmacy order.",
+  description: "Enter your order number to see the latest status of your 24Zone Pharmacy order.",
   alternates: { canonical: "/track" },
 };
 
 export default async function TrackPage({ searchParams }: { searchParams: Promise<{ order?: string }> }) {
   const raw = (await searchParams).order?.trim().replace(/^#/, "").toUpperCase().slice(0, 20);
-  const valid = raw && /^MZ[A-Z0-9]{6,12}$/.test(raw);
+  const valid = raw && /^(24Z|MZ)[A-Z0-9]{6,12}$/.test(raw);
   let limited = false;
   let bundle = null;
   if (valid) {
@@ -42,7 +42,7 @@ export default async function TrackPage({ searchParams }: { searchParams: Promis
           <label htmlFor="track-order" className="sr-only">
             Order number
           </label>
-          <input id="track-order" name="order" required maxLength={20} defaultValue={raw ?? ""} placeholder="e.g. MZ7K3F9Q2X" autoComplete="off" className="input flex-1 py-3 uppercase placeholder:normal-case" />
+          <input id="track-order" name="order" required maxLength={20} defaultValue={raw ?? ""} placeholder="e.g. 24Z7K3F9Q2X" autoComplete="off" className="input flex-1 py-3 uppercase placeholder:normal-case" />
           <button type="submit" className="btn btn-primary px-6 py-3">
             <Search className="size-4" /> Track Order
           </button>

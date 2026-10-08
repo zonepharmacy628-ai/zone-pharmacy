@@ -4,6 +4,7 @@ import {
   Boxes,
   CalendarClock,
   ChartColumn,
+  ChevronDown,
   ClipboardList,
   ClipboardPlus,
   ExternalLink,
@@ -38,7 +39,7 @@ export function AdminShell({
   badges,
   children,
 }: {
-  user: { name: string; role: Role; permissions: string[] };
+  user: { name: string; email: string; role: Role; permissions: string[] };
   pharmacyName: string;
   logoFileId: string | null;
   badges: { orders: number; requests: number };
@@ -46,10 +47,13 @@ export function AdminShell({
 }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const [account, setAccount] = useState(false);
+  const isOwner = user.role === "owner";
   const [lastPath, setLastPath] = useState(pathname);
   if (lastPath !== pathname) {
     setLastPath(pathname);
     setOpen(false);
+    setAccount(false);
   }
 
   const items: NavItem[] = [
@@ -120,14 +124,63 @@ export function AdminShell({
             <Logo name={pharmacyName} logoFileId={logoFileId} light />
           </Link>
           <span className="ml-2 hidden rounded-full bg-white/10 px-3 py-1 text-xs font-semibold md:inline">Admin Panel</span>
-          <div className="ml-auto flex items-center gap-3">
-            <span className="grid size-9 place-items-center rounded-full bg-brand-500">
-              <User className="size-5" />
-            </span>
-            <div className="hidden leading-tight sm:block">
-              <p className="text-sm font-semibold">{user.name}</p>
-              <p className="text-xs text-white/70">{ROLE_LABELS[user.role]}</p>
-            </div>
+          <div className="relative ml-auto">
+            <button
+              type="button"
+              onClick={() => setAccount((v) => !v)}
+              aria-haspopup="menu"
+              aria-expanded={account}
+              aria-label={`Account menu for ${user.name}`}
+              className="flex min-h-11 items-center gap-3 rounded-xl px-2 py-1 text-left hover:bg-white/10"
+            >
+              <span className="grid size-9 shrink-0 place-items-center rounded-full bg-brand-500">
+                <User className="size-5" />
+              </span>
+              <span className="hidden leading-tight sm:block">
+                <span className="block max-w-40 truncate text-sm font-semibold">{user.name}</span>
+                <span className="block text-xs text-white/70">{ROLE_LABELS[user.role]}</span>
+              </span>
+              <ChevronDown className={cn("size-4 text-white/70 transition-transform", account && "rotate-180")} />
+            </button>
+            {account && (
+              <>
+                <button type="button" aria-label="Close account menu" className="fixed inset-0 z-40 cursor-default" onClick={() => setAccount(false)} />
+                <div role="menu" className="absolute top-full right-0 z-50 mt-2 w-72 max-w-[calc(100vw-2rem)] rounded-2xl border border-line bg-white p-2 text-navy-900 shadow-pop">
+                  <div className="border-b border-line px-3 pt-2 pb-3">
+                    <p className="truncate text-sm font-bold">{user.name}</p>
+                    <p className="truncate text-xs text-navy-500">{user.email}</p>
+                    <span className="badge mt-2 bg-brand-100 text-brand-700">{ROLE_LABELS[user.role]}</span>
+                  </div>
+                  <div className="py-1">
+                    <AccountLink href="/admin/profile" icon={User}>
+                      My Profile
+                    </AccountLink>
+                    {/* Owner-only pages. Each one re-checks the owner role on the server. */}
+                    {isOwner && (
+                      <>
+                        <AccountLink href="/admin/staff" icon={UserCog}>
+                          Staff &amp; Permissions
+                        </AccountLink>
+                        <AccountLink href="/admin/activity" icon={ScrollText}>
+                          Activity Log
+                        </AccountLink>
+                        <AccountLink href="/admin/settings" icon={MonitorCog}>
+                          Website Editor
+                        </AccountLink>
+                      </>
+                    )}
+                    <AccountLink href="/" icon={ExternalLink}>
+                      View Website
+                    </AccountLink>
+                  </div>
+                  <form action={logoutAction} className="border-t border-line pt-1">
+                    <button type="submit" role="menuitem" className="flex min-h-11 w-full items-center gap-3 rounded-xl px-3 text-sm font-semibold text-navy-800 hover:bg-red-50 hover:text-red-600">
+                      <LogOut className="size-4" /> Log Out
+                    </button>
+                  </form>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </header>
@@ -151,5 +204,13 @@ export function AdminShell({
         <main className="min-w-0 flex-1 p-4 sm:p-6 lg:p-8">{children}</main>
       </div>
     </div>
+  );
+}
+
+function AccountLink({ href, icon: Icon, children }: { href: string; icon: LucideIcon; children: React.ReactNode }) {
+  return (
+    <Link href={href} role="menuitem" className="flex min-h-11 items-center gap-3 rounded-xl px-3 text-sm font-semibold text-navy-800 hover:bg-brand-50">
+      <Icon className="size-4 text-brand-600" /> {children}
+    </Link>
   );
 }

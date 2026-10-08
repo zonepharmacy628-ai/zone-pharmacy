@@ -41,7 +41,7 @@
     "tsx": "^4.23.15",
     "typescript": "^5"
   },
-  "description": "MediZone Pharmacy — online pharmacy storefront and admin panel",
+  "description": "24Zone Pharmacy — online pharmacy storefront and admin panel",
   "engines": {
     "node": ">=20.9"
   }

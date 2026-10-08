@@ -18,7 +18,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
         <p className="mt-1 mb-6 text-sm text-navy-500">Sign in to your account to track orders and check out faster.</p>
         <LoginForm next={next} />
         <p className="mt-6 text-center text-sm text-navy-700">
-          New to MediZone?{" "}
+          New to 24Zone Pharmacy?{" "}
           <Link href={`/register${qs}`} className="font-semibold text-brand-600 hover:underline">
             Create an account
           </Link>

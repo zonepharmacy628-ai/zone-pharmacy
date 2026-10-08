@@ -52,7 +52,8 @@ class OrderError extends Error {}
 
 const ORDER_ALPHABET = "23456789ABCDEFGHJKLMNPQRSTUVWXYZ";
 function newOrderNumber() {
-  let s = "MZ";
+  // Orders placed before the 24Zone rename keep their "MZ" numbers.
+  let s = "24Z";
   for (let i = 0; i < 8; i++) s += ORDER_ALPHABET[randomInt(ORDER_ALPHABET.length)];
   return s;
 }

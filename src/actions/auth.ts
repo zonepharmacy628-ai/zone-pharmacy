@@ -10,7 +10,7 @@ import type { ActionResult } from "@/lib/constants";
 import { getDb } from "@/lib/db";
 import { users } from "@/lib/db/schema";
 import { isStaffRole } from "@/lib/permissions";
-import { formObject, invalid, rateLimit, TOO_MANY } from "@/lib/server-utils";
+import { formObject, invalid, logActivity, rateLimit, TOO_MANY } from "@/lib/server-utils";
 import { emailSchema, nameSchema, passwordSchema, phoneSchema } from "@/lib/validators";
 
 const registerSchema = z.object({
@@ -39,7 +39,7 @@ export async function registerAction(fd: FormData): Promise<ActionResult<{ redir
     .returning({ id: users.id, sessionVersion: users.sessionVersion });
   await createSession(user);
   revalidatePath("/", "layout");
-  return { ok: true, message: "Welcome to MediZone!", data: { redirectTo: safeNext(fd.get("next")?.toString(), "/account") } };
+  return { ok: true, message: "Welcome to 24Zone Pharmacy!", data: { redirectTo: safeNext(fd.get("next")?.toString(), "/account") } };
 }
 
 let dummyHash: string | undefined;
@@ -90,5 +90,6 @@ export async function changePasswordAction(fd: FormData): Promise<ActionResult> 
     .where(eq(users.id, me.id))
     .returning({ id: users.id, sessionVersion: users.sessionVersion });
   await createSession(updated);
+  if (isStaffRole(me.role)) await logActivity(me, "Password changed");
   return { ok: true, message: "Password updated." };
 }

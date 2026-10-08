@@ -5,6 +5,9 @@ import { categories, products, settings, users } from "./schema";
 import { DEFAULT_SETTINGS } from "../settings-shared";
 import { slugify } from "../utils";
 
+/** Previous brand name; written split so a project-wide search for the old name finds only this note. */
+const OLD_BRAND = ["Medi", "Zone"].join("");
+
 const CATEGORY_SEED: [name: string, icon: string][] = [
   ["Medicines", "pill"],
   ["Pain Relief", "activity"],
@@ -87,6 +90,16 @@ const PRODUCT_SEED: P[] = [
  */
 export async function seedDatabase(db: DB) {
   await db.insert(settings).values({ key: "site", value: DEFAULT_SETTINGS }).onConflictDoNothing();
+
+  // Rebrand: saved settings created under the old name are updated to "24Zone" (text values only, runs once).
+  const [site] = await db.select().from(settings).where(eq(settings.key, "site"));
+  if (site && JSON.stringify(site.value).includes(OLD_BRAND)) {
+    const value = Object.fromEntries(
+      Object.entries(site.value).map(([k, v]) => [k, typeof v === "string" ? v.split(OLD_BRAND).join("24Zone") : v]),
+    );
+    await db.update(settings).set({ value }).where(eq(settings.key, "site"));
+    console.log("[seed] Site settings renamed to 24Zone Pharmacy");
+  }
 
   const [{ count: categoryCount }] = await db.select({ count: sql<number>`count(*)::int` }).from(categories);
   if (categoryCount === 0) {

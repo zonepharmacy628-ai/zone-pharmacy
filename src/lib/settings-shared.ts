@@ -38,8 +38,8 @@ export type SiteSettings = {
 };
 
 export const DEFAULT_SETTINGS: SiteSettings = {
-  pharmacyName: "MediZone Pharmacy",
-  websiteTitle: "MediZone Pharmacy — Genuine Medicines, Fast Delivery",
+  pharmacyName: "24Zone Pharmacy",
+  websiteTitle: "24Zone Pharmacy — Genuine Medicines, Fast Delivery",
   tagline: "Your Health, Our Priority",
   logoFileId: null,
   faviconFileId: null,
