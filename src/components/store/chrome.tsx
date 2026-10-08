@@ -1,6 +1,6 @@
 "use client";
 
-import { Heart, Home, LayoutGrid, ShoppingCart, User } from "lucide-react";
+import { Heart, Home, LayoutGrid, LogIn, ShoppingCart, User } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
@@ -10,7 +10,7 @@ import { useStore } from "./store-context";
 export function MobileNav() {
   const pathname = usePathname();
   const { user, count, wishlistIds, ready } = useStore();
-  const accountHref = user ? (user.isStaff ? "/admin" : "/account") : "/login";
+  const accountHref = user ? "/account" : "/login";
   const tabs = [
     { href: "/", label: "Home", icon: Home, active: pathname === "/" },
     { href: "/products", label: "Categories", icon: LayoutGrid, active: pathname.startsWith("/products") || pathname.startsWith("/category") },
@@ -22,7 +22,12 @@ export function MobileNav() {
       active: pathname === "/account/wishlist",
       badge: wishlistIds.size,
     },
-    { href: accountHref, label: "Account", icon: User, active: pathname.startsWith("/account") && pathname !== "/account/wishlist" },
+    {
+      href: accountHref,
+      label: user ? "Account" : "Login",
+      icon: user ? User : LogIn,
+      active: (pathname.startsWith("/account") && pathname !== "/account/wishlist") || pathname === "/login" || pathname === "/register",
+    },
   ];
   return (
     <nav aria-label="Quick navigation" className="no-print fixed inset-x-0 bottom-0 z-40 border-t border-line bg-white pb-[env(safe-area-inset-bottom)] lg:hidden">

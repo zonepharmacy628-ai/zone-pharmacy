@@ -1,6 +1,6 @@
 "use client";
 
-import { ClipboardPlus, Heart, LogOut, MapPin, Package, Settings, User } from "lucide-react";
+import { ClipboardPlus, Heart, LayoutDashboard, LogOut, MapPin, Package, Settings, User } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { logoutAction } from "@/actions/auth";
@@ -31,25 +31,26 @@ export function AccountNav() {
         </div>
       </div>
       <nav aria-label="Account">
-        <ul className="no-scrollbar flex gap-1 overflow-x-auto lg:block lg:space-y-1">
+        {/* A wrapping grid on phones and tablets (never a horizontal scroller), a vertical list on desktop. */}
+        <ul className="grid grid-cols-2 gap-1 sm:grid-cols-3 lg:block lg:space-y-1">
           {LINKS.map((l) => {
             const active = l.href === "/account" ? pathname === "/account" : pathname.startsWith(l.href);
             return (
-              <li key={l.href} className="shrink-0">
+              <li key={l.href}>
                 <Link
                   href={l.href}
                   aria-current={active ? "page" : undefined}
-                  className={cn("flex items-center gap-3 rounded-xl px-3 py-2.5 transition", active ? "bg-brand-100" : "hover:bg-brand-50")}
+                  className={cn("flex h-full items-center gap-2 rounded-xl px-2 py-2.5 transition sm:gap-3 sm:px-3", active ? "bg-brand-100" : "hover:bg-brand-50")}
                 >
                   <span className={cn("grid size-9 shrink-0 place-items-center rounded-full", active ? "bg-brand-600 text-white" : "bg-brand-50 text-brand-600")}>
                     <l.icon className="size-4" />
                   </span>
                   <span className="min-w-0 flex-1">
-                    <span className="block text-sm font-semibold whitespace-nowrap text-navy-900">{l.label}</span>
+                    <span className="block text-sm leading-tight font-semibold text-navy-900 lg:whitespace-nowrap">{l.label}</span>
                     <span className="hidden text-xs text-navy-500 lg:block">{l.sub}</span>
                   </span>
                   {l.href === "/account/wishlist" && wishlistIds.size > 0 && (
-                    <span className="grid size-5 place-items-center rounded-full bg-brand-600 text-[10px] font-bold text-white">{wishlistIds.size}</span>
+                    <span className="grid size-5 shrink-0 place-items-center rounded-full bg-brand-600 text-[10px] font-bold text-white">{wishlistIds.size}</span>
                   )}
                 </Link>
               </li>
@@ -57,6 +58,17 @@ export function AccountNav() {
           })}
         </ul>
       </nav>
+      {/* Staff and the owner reach the admin panel from here; customers never see this link. */}
+      {user?.isStaff && (
+        <div className="mt-2 border-t border-line pt-2">
+          <Link href="/admin" className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-navy-800 hover:bg-brand-50">
+            <span className="grid size-9 place-items-center">
+              <LayoutDashboard className="size-4" />
+            </span>
+            Admin Panel
+          </Link>
+        </div>
+      )}
       <form action={logoutAction} className="mt-2 border-t border-line pt-2">
         <button type="submit" className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-navy-800 hover:bg-red-50 hover:text-red-600">
           <span className="grid size-9 place-items-center">

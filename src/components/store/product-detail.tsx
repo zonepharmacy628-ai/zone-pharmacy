@@ -58,7 +58,7 @@ export function BuyBox({ product }: { product: ProductCardData }) {
           <Zap className="size-5" /> Buy Now
         </button>
       </div>
-      <WishlistButton productId={product.id} withLabel className="mt-5" />
+      <WishlistButton productId={product.id} withLabel className="mt-3 py-2.5" />
     </div>
   );
 }

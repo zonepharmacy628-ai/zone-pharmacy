@@ -4,7 +4,6 @@ import {
   ChevronDown,
   ClipboardPlus,
   Heart,
-  LayoutDashboard,
   LayoutGrid,
   LogIn,
   Menu,
@@ -46,9 +45,24 @@ function SearchForm({ id, className }: { id: string; className?: string }) {
   );
 }
 
-function IconLink({ href, label, badge, children, sub }: { href: string; label: string; badge?: number; sub?: string; children: React.ReactNode }) {
+function IconLink({
+  href,
+  label,
+  mobileLabel,
+  badge,
+  children,
+  sub,
+}: {
+  href: string;
+  label: string;
+  /** Shorter label shown under the icon on phones, where the full one does not fit beside the logo. */
+  mobileLabel?: string;
+  badge?: number;
+  sub?: string;
+  children: React.ReactNode;
+}) {
   return (
-    <Link href={href} className="group flex flex-col items-center gap-0.5 text-xs font-medium text-navy-800 hover:text-brand-600">
+    <Link href={href} aria-label={label} className="group flex min-h-11 min-w-11 flex-col items-center justify-center gap-0.5 text-xs font-medium text-navy-800 hover:text-brand-600">
       <span className="relative">
         {children}
         {badge ? (
@@ -57,6 +71,7 @@ function IconLink({ href, label, badge, children, sub }: { href: string; label: 
           </span>
         ) : null}
       </span>
+      {mobileLabel && <span className="text-[11px] leading-none sm:hidden">{mobileLabel}</span>}
       <span className="hidden sm:block">{label}</span>
       {sub && <span className="hidden text-[11px] text-navy-500 lg:block">{sub}</span>}
     </Link>
@@ -79,7 +94,8 @@ export function Header({ categories }: { categories: NavCategory[] }) {
 
   const primary = categories.slice(0, 6);
   const rest = categories.slice(6);
-  const accountHref = user ? (user.isStaff ? "/admin" : "/account") : "/login";
+  // The storefront only ever links to the customer account or login/register, never to the admin panel.
+  const accountHref = user ? "/account" : "/login";
 
   return (
     <header className="no-print relative z-50 bg-white shadow-[0_1px_0_var(--color-line)]">
@@ -93,7 +109,7 @@ export function Header({ categories }: { categories: NavCategory[] }) {
             <span className="flex items-center gap-1.5">
               <ShieldCheck className="size-4" /> 100% Genuine Medicines
             </span>
-            <Link href="/track" className="flex items-center gap-1.5 hover:text-brand-300">
+            <Link href="/track" className="flex h-9 items-center gap-1.5 hover:text-brand-300">
               <PackageSearch className="size-4" /> Track Order
             </Link>
           </div>
@@ -108,17 +124,18 @@ export function Header({ categories }: { categories: NavCategory[] }) {
           <Logo name={settings.pharmacyName} logoFileId={settings.logoFileId} />
         </Link>
         <SearchForm id="site-search" className="hidden flex-1 md:flex" />
-        <div className="ml-auto flex items-center gap-5 sm:gap-7">
-          {/* On phones these two live in the bottom tab bar instead. */}
+        <div className="ml-auto flex items-center gap-2 sm:gap-7">
+          {/* On phones the wishlist lives in the bottom tab bar instead. */}
           <span className="hidden sm:contents">
             <IconLink href={user ? "/account/wishlist" : "/login?next=/account/wishlist"} label="Wishlist" badge={wishlistIds.size}>
               <Heart className="size-6" />
             </IconLink>
-            <IconLink href={accountHref} label={user ? (user.isStaff ? "Admin" : "Account") : "Sign in"}>
-              {user ? user.isStaff ? <LayoutDashboard className="size-6" /> : <User className="size-6" /> : <LogIn className="size-6" />}
-            </IconLink>
           </span>
-          <IconLink href="/cart" label="Cart" badge={ready ? count : 0} sub={ready && count ? formatMoney(subtotal, settings.currency) : undefined}>
+          {/* Login / Register (or Account) is shown in the header at every screen size. */}
+          <IconLink href={accountHref} label={user ? "Account" : "Login / Register"} mobileLabel={user ? "Account" : "Login"}>
+            {user ? <User className="size-6" /> : <LogIn className="size-6" />}
+          </IconLink>
+          <IconLink href="/cart" label="Cart" mobileLabel="Cart" badge={ready ? count : 0} sub={ready && count ? formatMoney(subtotal, settings.currency) : undefined}>
             <ShoppingCart className="size-6" />
           </IconLink>
         </div>
@@ -156,8 +173,8 @@ export function Header({ categories }: { categories: NavCategory[] }) {
           <NavLink href="/" active={pathname === "/"}>
             Home
           </NavLink>
-          {primary.map((c) => (
-            <NavLink key={c.id} href={`/category/${c.slug}`} active={pathname === `/category/${c.slug}`}>
+          {primary.map((c, i) => (
+            <NavLink key={c.id} href={`/category/${c.slug}`} active={pathname === `/category/${c.slug}`} className={i >= 4 ? "hidden xl:block" : undefined}>
               {c.name}
             </NavLink>
           ))}
@@ -173,6 +190,12 @@ export function Header({ categories }: { categories: NavCategory[] }) {
             </button>
             {menu === "more" && (
               <div className="absolute top-full right-0 z-50 w-64 rounded-2xl border border-line bg-white p-2 shadow-pop">
+                {/* The two categories hidden from the row on narrower screens appear here instead. */}
+                {primary.slice(4).map((c) => (
+                  <Link key={c.id} href={`/category/${c.slug}`} className="block rounded-lg px-3 py-2 text-sm font-medium text-navy-800 hover:bg-brand-50 hover:text-brand-700 xl:hidden">
+                    {c.name}
+                  </Link>
+                ))}
                 {rest.map((c) => (
                   <Link key={c.id} href={`/category/${c.slug}`} className="block rounded-lg px-3 py-2 text-sm font-medium text-navy-800 hover:bg-brand-50 hover:text-brand-700">
                     {c.name}
@@ -205,6 +228,9 @@ export function Header({ categories }: { categories: NavCategory[] }) {
               </button>
             </div>
             <div className="flex-1 overflow-y-auto p-3">
+              <DrawerLink href={accountHref} icon={user ? <User className="size-4" /> : <LogIn className="size-4" />}>
+                {user ? "My Account" : "Login / Register"}
+              </DrawerLink>
               <DrawerLink href="/products" icon={<LayoutGrid className="size-4" />}>
                 All Products
               </DrawerLink>
@@ -228,7 +254,7 @@ export function Header({ categories }: { categories: NavCategory[] }) {
   );
 }
 
-function NavLink({ href, active, children }: { href: string; active: boolean; children: React.ReactNode }) {
+function NavLink({ href, active, className, children }: { href: string; active: boolean; className?: string; children: React.ReactNode }) {
   return (
     <Link
       href={href}
@@ -236,6 +262,7 @@ function NavLink({ href, active, children }: { href: string; active: boolean; ch
       className={cn(
         "border-b-2 px-3 py-4 text-sm font-medium whitespace-nowrap transition-colors",
         active ? "border-brand-600 text-brand-600" : "border-transparent text-navy-800 hover:text-brand-600",
+        className,
       )}
     >
       {children}

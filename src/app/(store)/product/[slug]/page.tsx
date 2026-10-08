@@ -106,7 +106,7 @@ export default async function ProductPage({ params }: Props) {
         ]}
       />
 
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)_minmax(0,3.5fr)]">
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)_minmax(0,3.5fr)]">
         <div className="card self-start p-4">
           <ProductImage name={p.name} imageFileId={p.imageFileId} priority sizes="(max-width: 1024px) 100vw, 480px" />
           <ul className="mt-4 flex flex-wrap justify-center gap-x-5 gap-y-2 rounded-xl bg-brand-50 p-3 text-xs font-medium text-navy-700">
@@ -165,7 +165,7 @@ export default async function ProductPage({ params }: Props) {
           <BuyBox product={card} />
         </div>
 
-        <div className="space-y-4 self-start">
+        <div className="space-y-4 self-start md:col-span-2 lg:col-span-1">
           <TrustList />
         </div>
       </div>

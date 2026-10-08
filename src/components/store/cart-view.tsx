@@ -87,7 +87,7 @@ export function CartView() {
   return (
     <div className="grid gap-6 lg:grid-cols-[1fr_380px]">
       <div className="card self-start">
-        <div className="hidden grid-cols-[1fr_110px_140px_110px_40px] gap-4 border-b border-line px-6 py-4 text-xs font-semibold tracking-wide text-navy-500 uppercase md:grid">
+        <div className="hidden grid-cols-[1fr_110px_140px_110px_40px] gap-4 border-b border-line px-6 py-4 text-xs font-semibold tracking-wide text-navy-500 uppercase xl:grid">
           <span>Product</span>
           <span>Price</span>
           <span>Quantity</span>
@@ -99,9 +99,9 @@ export function CartView() {
             const { product, qty, lineTotal } = line;
             const problem = lineProblem(line);
             return (
-              <li key={product.id} className="grid grid-cols-[72px_1fr] gap-x-4 gap-y-3 p-4 md:grid-cols-[1fr_110px_140px_110px_40px] md:items-center md:px-6">
-                <div className="contents md:flex md:items-center md:gap-4">
-                  <Link href={`/product/${product.slug}`} className="row-span-2 w-[72px] shrink-0 md:w-20">
+              <li key={product.id} className="grid grid-cols-[72px_1fr] gap-x-4 gap-y-3 p-4 xl:grid-cols-[1fr_110px_140px_110px_40px] xl:items-center xl:px-6">
+                <div className="contents xl:flex xl:items-center xl:gap-4">
+                  <Link href={`/product/${product.slug}`} className="w-[72px] shrink-0 xl:w-20">
                     <ProductImage name={product.name} imageFileId={product.imageFileId} sizes="80px" />
                   </Link>
                   <div className="min-w-0">
@@ -115,14 +115,14 @@ export function CartView() {
                       </p>
                     )}
                     <p className={problem ? "mt-1 text-xs font-semibold text-red-600" : "mt-1 text-xs font-medium text-emerald-700"}>{problem ?? "In Stock"}</p>
-                    <p className="mt-1 text-sm font-semibold md:hidden">{formatMoney(product.price, c)}</p>
+                    <p className="mt-1 text-sm font-semibold xl:hidden">{formatMoney(product.price, c)}</p>
                   </div>
                 </div>
-                <p className="hidden text-sm font-semibold md:block">{formatMoney(product.price, c)}</p>
-                <div className="col-start-2 flex items-center justify-between gap-3 md:contents">
+                <p className="hidden text-sm font-semibold xl:block">{formatMoney(product.price, c)}</p>
+                <div className="col-span-2 flex items-center justify-between gap-3 xl:contents">
                   <QtyStepper small value={qty} onChange={(n) => setQty(product.id, n)} max={Math.max(1, Math.min(product.stock, MAX_CART_QTY))} />
-                  <p className="text-sm font-bold text-navy-900">{formatMoney(lineTotal, c)}</p>
-                  <button type="button" onClick={() => remove(product.id)} aria-label={`Remove ${product.name}`} className="rounded-lg p-2 text-navy-500 hover:bg-red-50 hover:text-red-600">
+                  <p className="text-sm font-bold whitespace-nowrap text-navy-900">{formatMoney(lineTotal, c)}</p>
+                  <button type="button" onClick={() => remove(product.id)} aria-label={`Remove ${product.name}`} className="rounded-lg p-2.5 text-navy-500 hover:bg-red-50 hover:text-red-600">
                     <Trash2 className="size-5" />
                   </button>
                 </div>
@@ -130,7 +130,7 @@ export function CartView() {
             );
           })}
         </ul>
-        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line p-4 md:px-6">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line p-4 xl:px-6">
           <Link href="/products" className="btn btn-ghost btn-sm text-brand-700">
             <ArrowLeft className="size-4" /> Continue Shopping
           </Link>

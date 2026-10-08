@@ -151,7 +151,7 @@ export function CheckoutForm({ addresses, payment }: { addresses: SavedAddress[]
             {user && addressId === "new" && (
               <div className="flex flex-wrap items-center gap-4 sm:col-span-2">
                 <CheckField name="saveAddress" label="Save this address to my account" />
-                <SelectField name="addressLabel" aria-label="Address type" defaultValue="home" className="w-auto py-2">
+                <SelectField name="addressLabel" aria-label="Address type" defaultValue="home" className="w-auto">
                   <option value="home">Home</option>
                   <option value="office">Office</option>
                   <option value="other">Other</option>

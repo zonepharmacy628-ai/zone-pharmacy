@@ -126,6 +126,11 @@ body {
   border-radius: var(--radius-lg);
   padding: 0.375rem 0.75rem;
   font-size: var(--text-xs);
+  /* Comfortable tap target on phones and tablets; compact on desktop. */
+  @media (width < 80rem) {
+    min-height: 2.5rem;
+    padding: 0.5rem 0.875rem;
+  }
 }
 
 @utility input {
@@ -148,6 +153,11 @@ body {
   }
   &:disabled {
     background: var(--color-surface);
+  }
+  /* 16px text stops iOS Safari from zooming the page when a field is focused. */
+  @media (width < 80rem) {
+    min-height: 2.75rem;
+    font-size: 1rem;
   }
 }
 

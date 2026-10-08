@@ -42,7 +42,7 @@ export function AddToCartButton({ product, qty = 1, className, small }: { produc
 }
 
 export function QtyStepper({ value, onChange, max, min = 1, small }: { value: number; onChange: (n: number) => void; max: number; min?: number; small?: boolean }) {
-  const btn = cn("grid place-items-center text-navy-700 hover:bg-brand-50 disabled:opacity-40", small ? "size-8" : "size-10");
+  const btn = cn("grid shrink-0 place-items-center text-navy-700 hover:bg-brand-50 disabled:opacity-40", small ? "size-10 xl:size-8" : "size-11 xl:size-10");
   return (
     <div className="inline-flex items-center overflow-hidden rounded-full border border-line bg-white">
       <button type="button" className={btn} onClick={() => onChange(value - 1)} disabled={value <= min} aria-label="Decrease quantity">
@@ -72,7 +72,7 @@ export function ProductCard({ product, priority }: { product: ProductCardData; p
           </span>
         )}
       </div>
-      <WishlistButton productId={product.id} className="absolute top-3 right-3 z-10 rounded-full bg-white/90 p-1.5 shadow-sm sm:top-4 sm:right-4" />
+      <WishlistButton productId={product.id} className="absolute top-2 right-2 z-10 rounded-full bg-white/90 p-2.5 shadow-sm sm:top-3 sm:right-3 xl:top-4 xl:right-4 xl:p-1.5" />
       <Link href={`/product/${product.slug}`} className="block" tabIndex={-1} aria-hidden="true">
         <ProductImage name={product.name} imageFileId={product.imageFileId} priority={priority} className={cn(out && "opacity-60")} />
       </Link>
@@ -124,10 +124,10 @@ export function ProductSlider({ products, title, href }: { products: ProductCard
               View All →
             </Link>
           )}
-          <button type="button" onClick={() => scroll(-1)} aria-label={`Scroll ${title} left`} className="hidden size-9 place-items-center rounded-full border border-line bg-white text-navy-800 shadow-sm hover:bg-brand-50 md:grid">
+          <button type="button" onClick={() => scroll(-1)} aria-label={`Scroll ${title} left`} className="hidden size-10 place-items-center rounded-full border border-line bg-white text-navy-800 shadow-sm hover:bg-brand-50 md:grid">
             <ChevronLeft className="size-5" />
           </button>
-          <button type="button" onClick={() => scroll(1)} aria-label={`Scroll ${title} right`} className="hidden size-9 place-items-center rounded-full border border-line bg-white text-navy-800 shadow-sm hover:bg-brand-50 md:grid">
+          <button type="button" onClick={() => scroll(1)} aria-label={`Scroll ${title} right`} className="hidden size-10 place-items-center rounded-full border border-line bg-white text-navy-800 shadow-sm hover:bg-brand-50 md:grid">
             <ChevronRight className="size-5" />
           </button>
         </div>

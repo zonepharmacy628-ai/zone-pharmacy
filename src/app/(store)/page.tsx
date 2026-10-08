@@ -22,38 +22,44 @@ export default async function HomePage() {
 
   return (
     <div className="container-page space-y-8 py-4 sm:space-y-10 sm:py-6">
-      <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-brand-100 via-brand-50 to-white">
-        <div className="grid items-center gap-4 p-6 sm:p-10 md:grid-cols-2 lg:p-14">
-          <div className="relative z-10">
-            {settings.heroBadge && <span className="badge mb-4 bg-white px-3 py-1 text-brand-700 shadow-sm">{settings.heroBadge}</span>}
-            <h1 className="text-3xl leading-tight font-extrabold tracking-tight text-navy-900 sm:text-4xl lg:text-5xl">
-              {settings.heroHeading} <span className="text-brand-600">{settings.heroHighlight}</span>
-            </h1>
-            <p className="mt-4 max-w-md text-base text-navy-700 sm:text-lg">{settings.heroDescription}</p>
-            <div className="mt-6 flex flex-wrap gap-3">
-              <Link href="/products" className="btn btn-primary rounded-full px-6 py-3 text-base">
-                Shop Now <ArrowRight className="size-4" />
-              </Link>
-              <Link href="/medicine-request" className="btn btn-outline rounded-full px-6 py-3 text-base">
-                Request a Medicine
-              </Link>
-            </div>
-            <ul className="mt-6 flex flex-wrap gap-x-6 gap-y-2 text-xs font-medium text-navy-700">
-              <li className="flex items-center gap-1.5">
-                <ShieldCheck className="size-4 text-brand-600" /> 100% Genuine Products
-              </li>
-              <li className="flex items-center gap-1.5">
-                <Truck className="size-4 text-brand-600" /> Delivery in {settings.deliveryTime}
-              </li>
-            </ul>
+      {/* Hero banner: copy on the left, pharmacy visual filling the right edge at every screen size. */}
+      <section className="relative isolate overflow-hidden rounded-3xl border border-line bg-gradient-to-br from-brand-100 via-brand-50 to-white shadow-card">
+        {/* The mask fades the visual into the copy side instead of ending on a hard edge. */}
+        <div
+          className="absolute inset-y-0 right-0 -z-10 w-[42%] sm:w-[46%] lg:w-1/2"
+          style={{ maskImage: "linear-gradient(to right, transparent, #000 42%)", WebkitMaskImage: "linear-gradient(to right, transparent, #000 42%)" }}
+        >
+          {heroImage ? (
+            <Image src={heroImage} alt="" fill unoptimized priority sizes="(max-width: 1024px) 46vw, 660px" className="object-cover" />
+          ) : (
+            <HeroArt className="size-full" />
+          )}
+        </div>
+
+        <div className="flex w-[62%] flex-col justify-center py-5 pl-5 sm:min-h-[21rem] sm:w-[56%] sm:py-8 sm:pl-10 lg:min-h-[30rem] lg:w-1/2 lg:py-14 lg:pl-14">
+          {settings.heroBadge && (
+            <span className="badge mb-2.5 self-start bg-white px-3 py-1 whitespace-normal text-brand-700 shadow-sm sm:mb-4">{settings.heroBadge}</span>
+          )}
+          <h1 className="text-2xl leading-[1.12] font-extrabold tracking-tight text-navy-900 sm:text-4xl lg:text-[3.4rem]">
+            {settings.heroHeading} <span className="text-brand-600">{settings.heroHighlight}</span>
+          </h1>
+          <p className="mt-2 max-w-md text-[13px]/[1.4] text-navy-700 sm:mt-4 sm:text-base lg:text-lg">{settings.heroDescription}</p>
+          <div className="mt-4 flex max-w-xs flex-col gap-2 sm:mt-6 sm:max-w-none sm:flex-row sm:flex-wrap sm:gap-3">
+            <Link href="/products" className="btn btn-primary justify-between rounded-xl px-4 py-2.5 text-sm shadow-md sm:px-5 sm:py-3 sm:text-base lg:justify-center lg:px-7 lg:py-3.5">
+              Shop Now <ArrowRight className="size-4" />
+            </Link>
+            <Link href="/medicine-request" className="btn btn-outline justify-between rounded-xl px-4 py-2.5 text-sm sm:px-5 sm:py-3 sm:text-base lg:justify-center lg:px-7 lg:py-3.5">
+              Request a Medicine <ArrowRight className="size-4" />
+            </Link>
           </div>
-          <div className="relative mx-auto w-full max-w-md">
-            {heroImage ? (
-              <Image src={heroImage} alt="" width={640} height={460} unoptimized priority className="h-auto max-h-80 w-full rounded-2xl object-cover" />
-            ) : (
-              <HeroArt className="h-auto w-full" />
-            )}
-          </div>
+          <ul className="mt-6 hidden flex-wrap gap-x-6 gap-y-2 text-xs font-medium text-navy-700 sm:flex">
+            <li className="flex items-center gap-1.5">
+              <ShieldCheck className="size-4 shrink-0 text-brand-600" /> 100% Genuine Products
+            </li>
+            <li className="flex items-center gap-1.5">
+              <Truck className="size-4 shrink-0 text-brand-600" /> Delivery in {settings.deliveryTime}
+            </li>
+          </ul>
         </div>
       </section>
 
@@ -66,17 +72,17 @@ export default async function HomePage() {
             View All →
           </Link>
         </div>
-        <ul className="no-scrollbar -mx-4 flex gap-3 overflow-x-auto px-4 sm:mx-0 sm:grid sm:grid-cols-4 sm:px-0 lg:grid-cols-8">
+        <ul className="grid grid-cols-2 gap-2.5 sm:grid-cols-4 sm:gap-3 lg:grid-cols-8">
           {popularCategories.map((c) => (
-            <li key={c.id} className="w-28 shrink-0 sm:w-auto">
+            <li key={c.id}>
               <Link
                 href={`/category/${c.slug}`}
-                className="flex h-full flex-col items-center gap-3 rounded-2xl border border-line p-4 text-center transition hover:border-brand-300 hover:bg-brand-50"
+                className="flex h-full items-center gap-2.5 rounded-2xl border border-line p-2.5 transition hover:border-brand-300 hover:bg-brand-50 sm:flex-col sm:gap-3 sm:p-4 sm:text-center"
               >
-                <span className="grid size-14 place-items-center rounded-full bg-brand-100 text-brand-600">
-                  <CategoryIcon name={c.icon} className="size-6" />
+                <span className="grid size-10 shrink-0 place-items-center rounded-full bg-brand-100 text-brand-600 sm:size-14">
+                  <CategoryIcon name={c.icon} className="size-5 sm:size-6" />
                 </span>
-                <span className="text-xs font-semibold text-navy-900 sm:text-sm">{c.name}</span>
+                <span className="min-w-0 text-xs leading-tight font-semibold text-navy-900 sm:text-sm">{c.name}</span>
               </Link>
             </li>
           ))}

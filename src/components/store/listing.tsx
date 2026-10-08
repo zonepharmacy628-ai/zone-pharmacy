@@ -1,4 +1,4 @@
-import { PackageSearch, SlidersHorizontal } from "lucide-react";
+import { LayoutGrid, PackageSearch, SlidersHorizontal } from "lucide-react";
 import Link from "next/link";
 import { CategoryIcon } from "@/components/brand";
 import { EmptyState, Pagination } from "@/components/ui/misc";
@@ -117,6 +117,32 @@ export async function ProductListing({
     </form>
   );
 
+  const categoryList = (
+    <ul className="space-y-0.5">
+      <li>
+        <Link href="/products" className={cn("flex min-h-10 items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium", !category ? "bg-brand-600 text-white" : "text-navy-800 hover:bg-brand-50")}>
+          All Products
+        </Link>
+      </li>
+      {categories.map((c) => {
+        const active = category?.slug === c.slug;
+        return (
+          <li key={c.id}>
+            <Link
+              href={`/category/${c.slug}`}
+              aria-current={active ? "page" : undefined}
+              className={cn("flex min-h-10 items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium", active ? "bg-brand-600 text-white" : "text-navy-800 hover:bg-brand-50")}
+            >
+              <CategoryIcon name={c.icon} className="size-4 shrink-0" />
+              <span className="flex-1">{c.name}</span>
+              <span className={cn("text-xs", active ? "text-white/80" : "text-navy-400")}>{c.productCount}</span>
+            </Link>
+          </li>
+        );
+      })}
+    </ul>
+  );
+
   return (
     <div className="container-page py-5 sm:py-8">
       <Breadcrumbs items={category ? [{ label: "All Products", href: "/products" }, { label: category.name }] : [{ label: "All Products" }]} />
@@ -140,31 +166,23 @@ export async function ProductListing({
             <div className="mt-4">{filters}</div>
           </details>
 
-          <nav aria-label="Categories" className="card p-3">
+          <details className="card group p-4 lg:hidden">
+            <summary className="flex cursor-pointer list-none items-center justify-between gap-3 text-sm font-bold text-navy-900">
+              <span className="flex min-w-0 items-center gap-2">
+                <LayoutGrid className="size-4 shrink-0 text-brand-600" />
+                <span className="truncate">Categories{category ? `: ${category.name}` : ""}</span>
+              </span>
+              <span className="text-xs font-semibold text-brand-600 group-open:hidden">Show</span>
+              <span className="hidden text-xs font-semibold text-brand-600 group-open:inline">Hide</span>
+            </summary>
+            <nav aria-label="Categories" className="mt-3">
+              {categoryList}
+            </nav>
+          </details>
+
+          <nav aria-label="Categories" className="card hidden p-3 lg:block">
             <h2 className="px-2 pt-1 pb-2 text-base font-bold text-navy-900">Categories</h2>
-            <ul className="no-scrollbar flex gap-2 overflow-x-auto lg:block lg:space-y-0.5">
-              <li className="shrink-0">
-                <Link href="/products" className={cn("flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium whitespace-nowrap", !category ? "bg-brand-600 text-white" : "text-navy-800 hover:bg-brand-50")}>
-                  All Products
-                </Link>
-              </li>
-              {categories.map((c) => {
-                const active = category?.slug === c.slug;
-                return (
-                  <li key={c.id} className="shrink-0">
-                    <Link
-                      href={`/category/${c.slug}`}
-                      aria-current={active ? "page" : undefined}
-                      className={cn("flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium whitespace-nowrap", active ? "bg-brand-600 text-white" : "text-navy-800 hover:bg-brand-50")}
-                    >
-                      <CategoryIcon name={c.icon} className="size-4 shrink-0" />
-                      <span className="flex-1">{c.name}</span>
-                      <span className={cn("text-xs", active ? "text-white/80" : "text-navy-400")}>{c.productCount}</span>
-                    </Link>
-                  </li>
-                );
-              })}
-            </ul>
+            {categoryList}
           </nav>
 
           <div className="card hidden p-4 lg:block">

@@ -101,7 +101,7 @@ export function Pagination({ page, pages, hrefFor }: { page: number; pages: numb
           <Link
             href={hrefFor(n)}
             aria-current={n === page ? "page" : undefined}
-            className={cn("btn btn-sm min-w-9", n === page ? "btn-primary" : "btn-outline")}
+            className={cn("btn btn-sm min-w-10", n === page ? "btn-primary" : "btn-outline")}
           >
             {n}
           </Link>

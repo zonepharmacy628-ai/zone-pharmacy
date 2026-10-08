@@ -68,41 +68,52 @@ export function Breadcrumbs({ items }: { items: { label: string; href?: string }
   );
 }
 
-/** Decorative hero artwork used until the owner uploads a banner image. */
+const PILL_ROWS = [0, 1, 2, 3, 4];
+
+function BlisterPack({ x, y, rotate, scale = 1 }: { x: number; y: number; rotate: number; scale?: number }) {
+  return (
+    <g transform={`translate(${x} ${y}) rotate(${rotate}) scale(${scale})`}>
+      <rect x="6" y="10" width="170" height="330" rx="18" fill="#121440" opacity=".28" />
+      <rect width="170" height="330" rx="18" fill="url(#hero-foil)" stroke="#ffffff" strokeOpacity=".55" strokeWidth="1.5" />
+      <path d="M0 165h170" stroke="#ffffff" strokeOpacity=".35" strokeDasharray="3 5" />
+      {PILL_ROWS.map((row) =>
+        [0, 1].map((col) => (
+          <g key={`${row}-${col}`} transform={`translate(${20 + col * 72} ${24 + row * 60})`}>
+            <rect x="2" y="4" width="58" height="34" rx="17" fill="#3c2899" opacity=".3" />
+            <rect width="58" height="34" rx="17" fill="url(#hero-pill)" stroke="#ffffff" strokeOpacity=".7" />
+            <rect x="9" y="6" width="26" height="7" rx="3.5" fill="#ffffff" opacity=".75" />
+          </g>
+        )),
+      )}
+    </g>
+  );
+}
+
+/** Hero artwork (blister packs) used until the owner uploads a banner image. Fills its box like a cover photo. */
 export function HeroArt({ className }: { className?: string }) {
   return (
-    <svg viewBox="0 0 420 300" className={className} aria-hidden="true">
+    <svg viewBox="0 0 400 520" preserveAspectRatio="xMidYMid slice" className={className} aria-hidden="true">
       <defs>
-        <linearGradient id="ha-box" x1="0" y1="0" x2="1" y2="1">
+        <linearGradient id="hero-bg" x1="0" y1="0" x2="1" y2="1">
           <stop offset="0" stopColor="#7558ec" />
-          <stop offset="1" stopColor="#3c2899" />
+          <stop offset=".55" stopColor="#4a31bd" />
+          <stop offset="1" stopColor="#1a1d52" />
         </linearGradient>
-        <linearGradient id="ha-cap" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0" stopColor="#5a3fd8" />
-          <stop offset="1" stopColor="#9a85f5" />
+        <linearGradient id="hero-foil" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#f6f4ff" />
+          <stop offset=".5" stopColor="#bfb1fb" />
+          <stop offset="1" stopColor="#ece8ff" />
+        </linearGradient>
+        <linearGradient id="hero-pill" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#ffffff" />
+          <stop offset="1" stopColor="#dcd4ff" />
         </linearGradient>
       </defs>
-      <ellipse cx="215" cy="262" rx="190" ry="22" fill="#dcd4ff" opacity=".7" />
-      <path d="M338 150c-6-44 14-78 52-92 6 40-10 74-52 92z" fill="#22a06b" opacity=".9" />
-      <path d="M342 176c14-30 40-46 70-42-10 30-34 46-70 42z" fill="#34c38f" opacity=".9" />
-      <path d="M338 150c14-34 30-60 52-92M342 176c22-18 44-32 70-42" stroke="#fff" strokeWidth="1.5" fill="none" opacity=".6" />
-      <rect x="222" y="70" width="128" height="180" rx="12" fill="#fff" stroke="#dcd4ff" strokeWidth="2" />
-      <rect x="222" y="178" width="128" height="72" rx="12" fill="url(#ha-box)" />
-      <rect x="222" y="178" width="128" height="14" fill="url(#ha-box)" />
-      <path d="M279 104h14v16h16v14h-16v16h-14v-16h-16v-14h16z" fill="#5a3fd8" />
-      <rect x="110" y="96" width="92" height="154" rx="16" fill="#fff" stroke="#dcd4ff" strokeWidth="2" />
-      <rect x="120" y="74" width="72" height="30" rx="8" fill="#f6f4ff" stroke="#dcd4ff" strokeWidth="2" />
-      <path d="M149 150h14v16h16v14h-16v16h-14v-16h-16v-14h16z" fill="#5a3fd8" />
-      <g transform="rotate(-24 70 220)">
-        <rect x="30" y="206" width="78" height="30" rx="15" fill="#fff" stroke="#dcd4ff" strokeWidth="2" />
-        <path d="M69 206h24a15 15 0 0 1 0 30H69z" fill="url(#ha-cap)" />
-      </g>
-      <g transform="rotate(18 190 248)">
-        <rect x="160" y="238" width="62" height="24" rx="12" fill="#fff" stroke="#dcd4ff" strokeWidth="2" />
-        <path d="M191 238h19a12 12 0 0 1 0 24h-19z" fill="#f59e0b" />
-      </g>
-      <circle cx="262" cy="258" r="13" fill="#fff" stroke="#dcd4ff" strokeWidth="2" />
-      <circle cx="56" cy="170" r="11" fill="#fff" stroke="#dcd4ff" strokeWidth="2" />
+      <rect width="400" height="520" fill="url(#hero-bg)" />
+      <circle cx="330" cy="70" r="120" fill="#ffffff" opacity=".07" />
+      <circle cx="60" cy="470" r="150" fill="#ffffff" opacity=".05" />
+      <BlisterPack x={235} y={-70} rotate={24} scale={0.95} />
+      <BlisterPack x={150} y={170} rotate={-10} scale={1.12} />
     </svg>
   );
 }
