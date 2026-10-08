@@ -1,4 +1,4 @@
-import { Clock, Mail, MapPin, Phone } from "lucide-react";
+import { Clock, Info, Mail, MapPin, Phone } from "lucide-react";
 import Link from "next/link";
 import { Logo } from "@/components/brand";
 import type { SiteSettings } from "@/lib/settings-shared";
@@ -63,19 +63,28 @@ export function Footer({ settings, categories }: { settings: SiteSettings; categ
         <div>
           <h2 className="mb-3 text-sm font-bold tracking-wider uppercase">Store</h2>
           <ul className="space-y-3 text-sm text-white/75">
+            <li>
+              <Link href="/about" className="-my-3 flex gap-2 py-3 hover:text-white">
+                <Info className="mt-0.5 size-4 shrink-0" /> About Us &amp; Information
+              </Link>
+            </li>
             {settings.storeAddress && (
               <li className="flex gap-2">
                 <MapPin className="mt-0.5 size-4 shrink-0" /> {settings.storeAddress}
               </li>
             )}
             {settings.storePhone && (
-              <li className="flex gap-2">
-                <Phone className="mt-0.5 size-4 shrink-0" /> {settings.storePhone}
+              <li>
+                <a href={`tel:${settings.storePhone.replace(/[^\d+]/g, "")}`} className="-my-3 flex gap-2 py-3 hover:text-white">
+                  <Phone className="mt-0.5 size-4 shrink-0" /> {settings.storePhone}
+                </a>
               </li>
             )}
             {settings.storeEmail && (
-              <li className="flex gap-2">
-                <Mail className="mt-0.5 size-4 shrink-0" /> <span className="break-all">{settings.storeEmail}</span>
+              <li>
+                <a href={`mailto:${settings.storeEmail}`} className="-my-3 flex gap-2 py-3 hover:text-white">
+                  <Mail className="mt-0.5 size-4 shrink-0" /> <span className="break-all">{settings.storeEmail}</span>
+                </a>
               </li>
             )}
             <li className="flex gap-2">
